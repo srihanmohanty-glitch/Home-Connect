@@ -15,28 +15,8 @@ const app = express();
 connectDB();
 
 // Init Middleware
-const allowedOrigins = [
-  process.env.FRONTEND_URL, // Only deployed frontend URL
-];
-
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    // Check if the origin matches the deployed frontend URL
-    if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) {
-      callback(null, true);
-    } else {
-      // For local development, allow localhost:5173 and localhost:3000 as well
-      const localAllowedOrigins = ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:3000'];
-      if (localAllowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    }
-  },
+  origin: 'http://localhost:5173', // Local frontend for development
   credentials: true,
 }));
 app.use(express.json());
@@ -55,5 +35,6 @@ app.use('/api/communications', communicationRoutes); // Use communicationRoutes
 app.use(notFound);
 app.use(errorHandler);
 
-// Export the app for Vercel serverless functions
-export default app;
+const PORT = process.env.PORT || 5001; // Back to 5001 as previously established
+
+app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
