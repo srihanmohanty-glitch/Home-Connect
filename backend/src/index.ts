@@ -51,6 +51,5 @@ app.use('/api/communications', communicationRoutes); // Use communicationRoutes
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+// Export the app for Vercel serverless functions
+export default app;
