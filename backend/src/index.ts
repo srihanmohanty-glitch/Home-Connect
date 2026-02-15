@@ -16,10 +16,7 @@ connectDB();
 
 // Init Middleware
 const allowedOrigins = [
-  process.env.FRONTEND_URL || 'http://localhost:3000',
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
-  'http://localhost:5173', // Add the frontend origin
+  process.env.FRONTEND_URL, // Only deployed frontend URL
 ];
 
 app.use(cors({
@@ -27,10 +24,17 @@ app.use(cors({
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    // Check if the origin matches the deployed frontend URL
+    if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      // For local development, allow localhost:5173 and localhost:3000 as well
+      const localAllowedOrigins = ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:3000'];
+      if (localAllowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
     }
   },
   credentials: true,
